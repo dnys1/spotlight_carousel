@@ -1,3 +1,8 @@
+## [0.1.0]
+
+* Added image to description
+* Added option for custom ScrollController
+
 ## [0.0.2]
 
 * Fixed README

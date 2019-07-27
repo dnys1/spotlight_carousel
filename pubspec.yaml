@@ -1,6 +1,6 @@
 name: spotlight_carousel
 description: A Flutter widget for displaying images in a carousel style with an optional page indicator.
-version: 0.0.2
+version: 0.1.0
 author: HumbleMe, Inc. <humbleme@protonmail.com>
 homepage: https://github.com/dnys1/spotlight_carousel
 

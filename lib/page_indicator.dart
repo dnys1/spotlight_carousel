@@ -4,29 +4,25 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class PageIndicator extends AnimatedWidget {
+class PageIndicator extends StatelessWidget {
   const PageIndicator({
-    @required this.controller,
+    @required this.page,
     @required this.itemCount,
     @required this.onPageSelected,
     this.color = Colors.white,
-  })  : assert(controller != null),
-        assert(itemCount != null),
-        assert(onPageSelected != null),
-        super(listenable: controller);
+  })  : assert(itemCount != null),
+        assert(onPageSelected != null);
 
-  final PageController controller;
   final int itemCount;
+  final double page;
   final ValueChanged<int> onPageSelected;
   final Color color;
 
   static const double _kDotSize = 6.0;
+  static const double _kMaxZoom = 1.5;
   static const double _kDotSpacing = 25.0;
 
   Widget _buildDot(int index) {
-    final double page = controller.hasClients
-        ? controller?.page ?? controller.initialPage.toDouble()
-        : controller.initialPage.toDouble();
     final double correctedPage = page % itemCount;
     double selectedness;
     if (correctedPage > itemCount - 1 && index == 0) {
@@ -36,7 +32,7 @@ class PageIndicator extends AnimatedWidget {
       selectedness = Curves.easeOut
           .transform(max(0.0, 1.0 - (correctedPage - index).abs()));
     }
-    final double zoom = 1.0 + selectedness / 2;
+    final double zoom = 1.0 + (_kMaxZoom - 1.0) * selectedness;
 
     final int pageForClicking = (page / itemCount).floor() * itemCount + index;
 

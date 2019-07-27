@@ -76,6 +76,7 @@ class SpotlightCarousel extends StatefulWidget {
     this.pageIndicatorColor = CupertinoColors.inactiveGray,
     this.maxSize,
     this.minSize = const Size(0, 0),
+    this.controller,
   })  : assert(titles == null || images.length == titles.length),
         assert(descriptions == null || images.length == descriptions.length),
         super(key: key);
@@ -103,12 +104,15 @@ class SpotlightCarousel extends StatefulWidget {
   /// The minimum size of the images
   final Size minSize;
 
+  /// Use a custom scroll controller to control the carousel
+  final ScrollController controller;
+
   @override
   _SpotlightCarouselState createState() => _SpotlightCarouselState();
 }
 
 class _SpotlightCarouselState extends State<SpotlightCarousel> {
-  final PageController _pageController = PageController(keepPage: false);
+  ScrollController _controller;
   static const Duration _kDuration = Duration(milliseconds: 300);
   static const Cubic _kCurve = Curves.ease;
 
@@ -120,18 +124,17 @@ class _SpotlightCarouselState extends State<SpotlightCarousel> {
   @override
   void initState() {
     super.initState();
-    _pageController.addListener(() => setState(() {
-          if (_pageController.page >= 0) {
-            _page = (_pageController.page >= 0) ? _pageController.page : 0.0;
+    if (widget.controller == null) {
+      _controller = PageController(keepPage: false);
+    } else {
+      _controller = widget.controller;
+    }
+    _controller.addListener(() => setState(() {
+          if (_controller.offset >= 0) {
+            _page = _controller.offset / MediaQuery.of(context).size.width;
             _pageIndex = (itemCount - (_page % itemCount).round()) % itemCount;
           }
         }));
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 
   @override
@@ -158,16 +161,27 @@ class _SpotlightCarouselState extends State<SpotlightCarousel> {
         Map<Widget, double>.fromEntries(itemList).keys.toList();
     return Stack(
       children: <Widget>[
-        PageView.custom(
-          controller: _pageController,
-          scrollDirection: Axis.horizontal,
-          childrenDelegate:
-              SliverChildBuilderDelegate((BuildContext context, int index) {
-            return Container(
-              color: Colors.transparent,
-            );
-          }),
-        ),
+        widget.controller == null || widget.controller is PageController
+            ? PageView.builder(
+                controller: _controller,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.transparent,
+                  );
+                },
+              )
+            : ListView.builder(
+                controller: _controller,
+                scrollDirection: Axis.horizontal,
+                itemExtent: MediaQuery.of(context).size.width,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    color: Colors.transparent,
+                  );
+                },
+              ),
         CustomMultiChildLayout(
           children: images,
           delegate: _SpotlightCarouselLayoutDelegate(
@@ -216,12 +230,12 @@ class _SpotlightCarouselState extends State<SpotlightCarousel> {
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 20.0),
                   child: PageIndicator(
-                    controller: _pageController,
+                    page: _page,
                     itemCount: itemCount,
                     color: CupertinoColors.inactiveGray,
                     onPageSelected: (int page) {
-                      _pageController.animateToPage(
-                        page,
+                      _controller.animateTo(
+                        page * MediaQuery.of(context).size.width,
                         duration: _kDuration,
                         curve: _kCurve,
                       );
