@@ -41,7 +41,7 @@ class _SpotlightCarouselLayoutDelegate extends MultiChildLayoutDelegate {
     for (int i = 0; i < itemCount; i++) {
       final String childId = 'item$i';
       final double alpha =
-          (i + offset * itemCount) * (2 * pi / itemCount) % (2 * pi);
+          2 * pi * (1 - (i - offset * itemCount) / itemCount) % (2 * pi);
 
       final double x = (1 - sin(alpha)) / 2;
       final double z = 1 - (1 - cos(alpha)) / 2;
@@ -132,7 +132,7 @@ class _SpotlightCarouselState extends State<SpotlightCarousel> {
     _controller.addListener(() => setState(() {
           if (_controller.offset >= 0) {
             _page = _controller.offset / MediaQuery.of(context).size.width;
-            _pageIndex = (itemCount - (_page % itemCount).round()) % itemCount;
+            _pageIndex = (_page % itemCount).round() % itemCount;
           }
         }));
   }
@@ -144,7 +144,7 @@ class _SpotlightCarouselState extends State<SpotlightCarousel> {
     final Map<Widget, double> distance =
         widget.images.asMap().map((int i, Image image) {
       final double alpha =
-          (i + offset * itemCount) * (2 * pi / itemCount) % (2 * pi);
+          2 * pi * (1 - (i - offset * itemCount) / itemCount) % (2 * pi);
       final double z = cos(alpha);
       return MapEntry<Widget, double>(
           LayoutId(
@@ -161,7 +161,7 @@ class _SpotlightCarouselState extends State<SpotlightCarousel> {
         Map<Widget, double>.fromEntries(itemList).keys.toList();
     return Stack(
       children: <Widget>[
-        widget.controller == null || widget.controller is PageController
+        _controller is PageController
             ? PageView.builder(
                 controller: _controller,
                 scrollDirection: Axis.horizontal,

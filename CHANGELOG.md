@@ -1,3 +1,7 @@
+## [0.1.1]
+
+* Fixed backwards bug
+
 ## [0.1.0]
 
 * Added image to description
