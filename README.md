@@ -4,7 +4,7 @@ A Flutter widget for displaying images in a carousel style with an optional page
 
 ## Getting Started
 
-<img src="images/spotlight_carousel.gif" alt="GIF preview" width="400" />
+<img src="https://github.com/dnys1/spotlight_carousel/blob/master/images/spotlight_carousel.gif?raw=true" alt="GIF preview" width="400" />
 
 To include in your Flutter project, import the base Dart file.
 
